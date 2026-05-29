@@ -1,9 +1,14 @@
 package com.wintux.compu.Tools;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 public class Calculadora {
 
+    // =========================
+    // PRIORIDAD DE OPERADORES
+    // =========================
     public static int prioridad(char operador) {
 
         switch (operador) {
@@ -23,73 +28,92 @@ public class Calculadora {
         return -1;
     }
 
-    public static String convertirAPostfix(String infix) {
-
-        StringBuilder postfix = new StringBuilder();
+    // ======================================
+    // CONVERTIR INFIJA A POSTFIJA
+    // USANDO PILA (STACK)
+    // ======================================
+    public static Queue<String> convertirAPostfix(String infix) {
 
         Stack<Character> pila = new Stack<>();
+
+        Queue<String> postfix = new LinkedList<>();
 
         for (int i = 0; i < infix.length(); i++) {
 
             char c = infix.charAt(i);
 
+            // Ignorar espacios
             if (c == ' ') {
                 continue;
             }
 
+            // Si es número
             if (Character.isDigit(c)) {
-                postfix.append(c);
+
+                postfix.offer(String.valueOf(c));
             }
 
+            // Si es (
             else if (c == '(') {
+
                 pila.push(c);
             }
 
+            // Si es )
             else if (c == ')') {
 
                 while (!pila.isEmpty() &&
                         pila.peek() != '(') {
 
-                    postfix.append(pila.pop());
+                    postfix.offer(String.valueOf(pila.pop()));
                 }
 
                 pila.pop();
             }
 
+            // Operadores
             else {
 
                 while (!pila.isEmpty() &&
                         prioridad(c) <= prioridad(pila.peek())) {
 
-                    postfix.append(pila.pop());
+                    postfix.offer(String.valueOf(pila.pop()));
                 }
 
                 pila.push(c);
             }
         }
 
+        // Vaciar pila
         while (!pila.isEmpty()) {
-            postfix.append(pila.pop());
+
+            postfix.offer(String.valueOf(pila.pop()));
         }
 
-        return postfix.toString();
+        return postfix;
     }
 
-    public static double resolverExpresionPostfix(
-            String postfix
-    ) {
+    // ======================================
+    // RESOLVER POSTFIJA
+    // USANDO PILA
+    // ======================================
+    public static double resolverExpresionPostfix(Queue<String> postfix) {
 
         Stack<Double> pila = new Stack<>();
 
-        for (int i = 0; i < postfix.length(); i++) {
+        while (!postfix.isEmpty()) {
 
-            char c = postfix.charAt(i);
+            String elemento = postfix.poll();
 
+            char c = elemento.charAt(0);
+
+            // Si es número
             if (Character.isDigit(c)) {
 
-                pila.push((double)(c - '0'));
+                pila.push(Double.parseDouble(elemento));
             }
 
+            // Si es operador
             else {
 
                 double b = pila.pop();
@@ -121,5 +145,18 @@ public class Calculadora {
         }
 
         return pila.pop();
+    }
+
+    // ======================================
+    // MOSTRAR POSTFIJA
+    // ======================================
+    public static void mostrarCola(Queue<String> cola) {
+
+        for (String elemento : cola) {
+
+            System.out.print(elemento + " ");
+        }
+
+        System.out.println();
     }
 }

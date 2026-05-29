@@ -5,11 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Queue;
+
 @RestController
 public class CalculadoraController {
 
     @GetMapping("/")
     public String inicio() {
+
         return "Calculadora Infix funcionando";
     }
 
@@ -18,11 +21,15 @@ public class CalculadoraController {
             @RequestParam String infix
     ) {
 
-        String postfix =
+        Queue<String> postfix =
+                Calculadora.convertirAPostfix(infix);
+
+        // Crear otra cola porque resolver la vacía
+        Queue<String> postfixResolver =
                 Calculadora.convertirAPostfix(infix);
 
         double resultado =
-                Calculadora.resolverExpresionPostfix(postfix);
+                Calculadora.resolverExpresionPostfix(postfixResolver);
 
         return "Infix: " + infix +
                 "\nPostfix: " + postfix +
